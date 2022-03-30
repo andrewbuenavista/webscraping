@@ -20,9 +20,70 @@ url = 'https://www.worldometers.info/coronavirus/country/us'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 
 
+req = Request(url,headers=headers)
 
+webpage = urlopen(req).read()
 
+soup = BeautifulSoup(webpage,'html.parser')
 
+title = soup.title
+
+print(title.text)
+
+table_rows = soup.findAll("tr")
+
+highestDeath = 0
+highestDeathName = ''
+
+lowestDeathRate = 0
+lowestDeathName = ''
+
+count = 0
+
+highestTest = 0
+highestTestName = ''
+
+lowestTest = 0
+lowestTestName = ''
+
+for row in table_rows[2:51]:
+
+    count +=1
+    td = row.findAll("td")
+
+    state = td[1].text
+    total_cases = int(td[2].text.replace(',',''))
+    total_deaths = int(td[4].text.replace(',',''))
+    total_tested = int(td[10].text.replace(',',''))
+
+    deathRatio = total_deaths/total_cases
+    testRatio = total_cases/total_tested
+
+    if count == 1:
+        lowestTest = testRatio
+        lowestDeathRate = deathRatio
+        lowestDeathName = state
+
+    if deathRatio < lowestDeathRate:
+        lowestDeathRate = deathRatio
+        lowestDeathName = state
+
+    if deathRatio > highestDeath:
+        highestDeath = deathRatio
+        highestDeathName = state
+
+    if testRatio < lowestTest:
+        lowestTest = testRatio
+        lowestTestName = state
+
+    if testRatio > highestTest:
+        highestTest = testRatio
+        highestTestName = state
+
+print(f"Highest death ratio: {highestDeathName}")
+print(f"Lowest death rate: {lowestDeathName}")
+print(f"Highest test ratio: {highestTestName}")
+print(f"Lowest test ratio: {lowestTestName}")
 
 #SOME USEFUL FUNCTIONS IN BEAUTIFULSOUP
 #-----------------------------------------------#
